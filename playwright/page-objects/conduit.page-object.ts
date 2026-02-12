@@ -17,7 +17,7 @@ export class ConduitPageObject {
 
   async intercept(method: 'POST' | 'GET' | 'PATCH' | 'DELETE' | 'PUT', url: string | RegExp, options: {
     fixture?: string
-    postFixture?: (fixture: any) => void | unknown
+    postFixture?: (fixture: unknown) => void | unknown
     statusCode?: number
     body?: unknown
     timeout?: number
@@ -30,7 +30,8 @@ export class ConduitPageObject {
 
       if (options.postFixture && options.fixture) {
         const body = await this.getFixture(options.fixture)
-        const returnValue = await options.postFixture(body)
+        // บอกให้ TS รู้ว่าเราส่ง body เข้าไปในฟังก์ชัน
+        const returnValue = await options.postFixture(body) 
         options.body = returnValue === undefined ? body : returnValue
         options.fixture = undefined
       }
