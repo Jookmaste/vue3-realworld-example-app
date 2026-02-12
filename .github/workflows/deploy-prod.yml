@@ -8,16 +8,39 @@ jobs:
   deploy-app:
     runs-on: ubuntu-latest
     steps:
-      - name: check out the code to build server
-        uses: actions/checkout@v3
-                
-      - name: set the ubuntu user as the owner
+      - name: check out the code
+        uses: actions/checkout@v4
+        
+      - name: setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 9
+
+      - name: setup node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: 'pnpm'
+
+      - name: build the code
+        run: |
+          pnpm install --no-frozen-lockfile
+          pnpm build
+
+      - name: prepare server environment
         uses: appleboy/ssh-action@v1.2.0
         with:
           host: ${{ secrets.PROD_HOST }}
           username: ${{ secrets.SSH_USER_NAME }}
           key: ${{ secrets.SSH_KEY }}
-          script: sudo chown -R ubuntu /var/www/html
+          script: |
+            # สร้างโฟลเดอร์และติดตั้ง nginx ถ้ายังไม่มี
+            sudo mkdir -p /var/www/html
+            if ! command -v nginx > /dev/null; then
+              sudo apt-get update && sudo apt-get install -y nginx
+            fi
+            # มอบสิทธิ์ให้ user ubuntu เพื่อให้ scp ไฟล์ลงไปได้
+            sudo chown -R ubuntu:ubuntu /var/www/html
 
       - name: copy file to server
         uses: appleboy/scp-action@master
@@ -26,7 +49,7 @@ jobs:
           username: ${{ secrets.SSH_USER_NAME }}
           port: ${{ secrets.SSH_PORT }}
           key: ${{ secrets.SSH_KEY }}
-          source: "./html/*"
+          source: "./dist/*"
           target: "/var/www/html"
           strip_components: 1
 
@@ -36,4 +59,6 @@ jobs:
           host: ${{ secrets.PROD_HOST }}
           username: ${{ secrets.SSH_USER_NAME }}
           key: ${{ secrets.SSH_KEY }}
-          script: sudo chown -R root /var/www/html
+          script: |
+            sudo chown -R root:root /var/www/html
+            sudo systemctl restart nginx
