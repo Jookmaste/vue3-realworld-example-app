@@ -59,7 +59,7 @@ test.afterEach(async ({ page }, testInfo) => {
       ? testInfo.error.stack 
       : String(testInfo.error);
 
-    process.stderr.write(`❌ ❌ PLAYWRIGHT TEST FAILURE ❌ ❌\n${errorMessage}\n`);
+    process.stderr.write(`❌ FAILURE ❌\n${errorMessage}\n`);
     
     testInfo.setTimeout(0);
     await page.pause();
