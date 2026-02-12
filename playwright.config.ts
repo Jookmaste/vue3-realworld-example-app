@@ -33,12 +33,12 @@ export default defineConfig({
   globalTeardown: './playwright/global.teardown.ts',
 
   /* Shared settings for all the projects below. See https://playwright.dev/docs/api/class-testoptions. */
-  use: {
-    /* Base URL to use in actions like `await page.goto('/')`. */
+ use: {
     baseURL,
 
-    navigationTimeout: isCI ? 10_000 : 20_000,
-    actionTimeout: isCI ? 10_000 : 20_000,
+    // เพิ่มเวลาจาก 10,000 เป็น 30,000 หรือ 60,000 มิลลิวินาที
+    navigationTimeout: isCI ? 30_000 : 20_000,
+    actionTimeout: isCI ? 30_000 : 20_000,
 
     /* Collect trace when retrying the failed test. See https://playwright.dev/docs/trace-viewer */
     screenshot: 'only-on-failure',

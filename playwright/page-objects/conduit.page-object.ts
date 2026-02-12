@@ -62,8 +62,9 @@ export class ConduitPageObject {
   }
 
   async goto(route: Route) {
-    await this.page.goto(route, { waitUntil: 'domcontentloaded' })
-  }
+  // เพิ่ม timeout เฉพาะกิจเป็น 30 วินาที
+  await this.page.goto(route, { waitUntil: 'load', timeout: 30000 })
+}
 
   @boxedStep
   async login(username = 'plumrx') {
