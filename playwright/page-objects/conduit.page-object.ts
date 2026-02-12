@@ -17,23 +17,24 @@ export class ConduitPageObject {
 
   async intercept(method: 'POST' | 'GET' | 'PATCH' | 'DELETE' | 'PUT', url: string | RegExp, options: {
     fixture?: string
-    postFixture?: (fixture: unknown) => void | unknown
+    postFixture?: (fixture: unknown) => void | unknown // เปลี่ยน any เป็น unknown ถ้าต้องการความเป๊ะ
     statusCode?: number
     body?: unknown
     timeout?: number
   } = {}): Promise<() => Promise<Response>> {
+
     await this.page.route(url, async route => {
-      if (route.request().url().endsWith('.ts'))
-        return await route.continue()
-      if (route.request().method() !== method)
-        return await route.continue()
+      // ... (โค้ดส่วนเช็ค method/url)
+      if (route.request().url().endsWith('.ts')) return await route.continue()
+      if (route.request().method() !== method) return await route.continue()
 
       if (options.postFixture && options.fixture) {
-        const body = await this.getFixture(options.fixture)
-        // บอกให้ TS รู้ว่าเราส่ง body เข้าไปในฟังก์ชัน
-        const returnValue = await options.postFixture(body) 
-        options.body = returnValue === undefined ? body : returnValue
-        options.fixture = undefined
+        const body = await this.getFixture(options.fixture);
+        
+        // 2. ใช้ Type Assertion เพื่อยืนยันว่าเรายอมรับความเสี่ยงตรงนี้ (ถ้าขี้เกียจไล่แก้ Type ทั้งระบบ)
+        const returnValue = await options.postFixture(body as any); 
+        options.body = returnValue === undefined ? body : returnValue;
+        options.fixture = undefined;
       }
 
       return await route.fulfill({

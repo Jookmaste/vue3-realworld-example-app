@@ -55,11 +55,15 @@ export const test = base.extend<{
 
 test.afterEach(async ({ page }, testInfo) => {
   if (!process.env.CI && testInfo.status !== testInfo.expectedStatus) {
-    // eslint-disable-next-line ts/restrict-template-expressions
-    process.stderr.write(`❌ ❌ PLAYWRIGHT TEST FAILURE ❌ ❌\n${testInfo.error?.stack ?? String(testInfo.error)}\n`)
-    testInfo.setTimeout(0)
-    await page.pause()
+    const errorMessage = testInfo.error instanceof Error 
+      ? testInfo.error.stack 
+      : String(testInfo.error);
+
+    process.stderr.write(`❌ ❌ PLAYWRIGHT TEST FAILURE ❌ ❌\n${errorMessage}\n`);
+    
+    testInfo.setTimeout(0);
+    await page.pause();
   }
-})
+});
 
 export const expect = test.expect
