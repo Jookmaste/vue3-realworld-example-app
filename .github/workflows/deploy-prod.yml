@@ -10,11 +10,9 @@ jobs:
     steps:
       - name: check out the code
         uses: actions/checkout@v4
-        
+
       - name: setup pnpm
         uses: pnpm/action-setup@v4
-        with:
-          version: 9
 
       - name: setup node
         uses: actions/setup-node@v4
@@ -34,12 +32,10 @@ jobs:
           username: ${{ secrets.SSH_USER_NAME }}
           key: ${{ secrets.SSH_KEY }}
           script: |
-            # สร้างโฟลเดอร์และติดตั้ง nginx ถ้ายังไม่มี
             sudo mkdir -p /var/www/html
             if ! command -v nginx > /dev/null; then
               sudo apt-get update && sudo apt-get install -y nginx
             fi
-            # มอบสิทธิ์ให้ user ubuntu เพื่อให้ scp ไฟล์ลงไปได้
             sudo chown -R ubuntu:ubuntu /var/www/html
 
       - name: copy file to server
