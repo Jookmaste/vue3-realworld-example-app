@@ -23,7 +23,7 @@ jobs:
 
       - name: build the code
         run: |
-          pnpm install -- no-frozen-lockfile
+          pnpm install --no-frozen-lockfile
           pnpm build
 
       - name: copy file to server
